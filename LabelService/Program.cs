@@ -1,3 +1,4 @@
+using LabelService.Controllers.Mappings;
 using LabelService.Domain.Models;
 using LabelService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(typeof(DomainMapping).Assembly);
 
 var app = builder.Build();
 

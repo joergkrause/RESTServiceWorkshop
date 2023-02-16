@@ -6,11 +6,11 @@ namespace LabelService.Controllers.Dtos
   {
     public int Id { get; set; }
 
-    public string Name { get; set; }
+    public string Name { get; set; } = default!;
 
-    public string TrackingId { get; set; }
+    public string TrackingId { get; set; } = default!;
 
-    public string Address { get; set; }
+    public string Address { get; set; } = default!;
 
     public int DeviceId { get; set; }
   }
