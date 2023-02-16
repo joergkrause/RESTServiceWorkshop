@@ -1,5 +1,7 @@
 using LabelService.Controllers.Mappings;
+using LabelService.Domain.Interface;
 using LabelService.Domain.Models;
+using LabelService.Infrastructure;
 using LabelService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -9,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<LabelContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LabelContext")));
+
+builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
