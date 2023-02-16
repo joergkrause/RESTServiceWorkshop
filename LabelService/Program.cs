@@ -1,5 +1,8 @@
+using LabelService.Domain.Models;
 using LabelService.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,5 +27,23 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
-
+await MigrateAsync();
 app.Run();
+
+async Task MigrateAsync()
+{
+  using var scope = app!.Services.CreateScope();
+  var services = scope.ServiceProvider;
+
+  var dbContext = services.GetRequiredService<LabelContext>();
+  bool newDatabase = !dbContext.Database.GetService<IRelationalDatabaseCreator>().Exists();
+  dbContext.Database.Migrate();
+  var dbNotEmpty = await dbContext.Set<Device>().AnyAsync();
+  if (newDatabase || !dbNotEmpty)
+  {
+    var device = new Device { Name = "Test", Type = 1 };
+    var label = new Label { Device = device, Name = "L1", Address = "Anschrift Demo", TrackingId = "A1234" };
+    dbContext.Labels.Add(label);
+    await dbContext.SaveChangesAsync();
+  }
+}
