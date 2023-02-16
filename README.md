@@ -1,1 +1,1 @@
-# PrologisWorkshop
+# REST Workshop
