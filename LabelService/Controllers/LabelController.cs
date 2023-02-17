@@ -5,11 +5,14 @@ using LabelService.Domain.Models;
 using LabelService.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace LabelService.Controllers
 {
   [Route("api/[controller]")]
   [ApiController]
+  [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
+  [Produces("application/json")]
   public class LabelController : ControllerBase
   {
 
@@ -22,16 +25,28 @@ namespace LabelService.Controllers
       _mapper = provider.GetRequiredService<IMapper>();
     }
 
+    /// <summary>
+    /// Get all labels.
+    /// </summary>
+    /// <returns></returns>
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<LabelDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get()
-    {
+    {     
       var models = await _labelRepo.GetLabels();
       var dtos = _mapper.Map<IEnumerable<LabelDto>>(models);
       return Ok(dtos);
     }
 
+    /// <summary>
+    /// Get single label.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
     [HttpGet]
     [Route("{id:int}")]
+    [ProducesResponseType(typeof(IEnumerable<LabelDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([FromRoute] int id)
     {
       var model = await _labelRepo.GetLabelById(id);
@@ -45,6 +60,8 @@ namespace LabelService.Controllers
 
     [HttpGet]
     [Route("bytrackingid/{trackingId:long}")]
+    [ProducesResponseType(typeof(LabelDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Get([FromRoute] long trackingId)
     {      
       var model = await _labelRepo.GetLabelByTrackingId(trackingId.ToString());
@@ -58,6 +75,9 @@ namespace LabelService.Controllers
 
     [HttpGet]
     [Route("searchbyname")]
+    [ProducesResponseType(typeof(IEnumerable<LabelDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status204NoContent)]
     public async Task<IActionResult> SearchByName([FromQuery(Name = "name")] string labelName)
     {
       if (String.IsNullOrEmpty(labelName))
@@ -74,6 +94,9 @@ namespace LabelService.Controllers
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
     public async Task<IActionResult> AddLabel([FromBody] LabelDto labelDto)
     {
       if (ModelState.IsValid)
@@ -86,6 +109,10 @@ namespace LabelService.Controllers
     }
 
     [HttpPut("{id}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(void), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> ChangeLabel(int id, [FromBody] LabelDto labelDto)
     {
       if (id != labelDto.Id)
@@ -102,6 +129,7 @@ namespace LabelService.Controllers
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status202Accepted)]
     public async Task<IActionResult> DeleteLabel(int id)
     {
       // NotFound()

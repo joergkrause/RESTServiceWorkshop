@@ -17,7 +17,26 @@ builder.Services.AddScoped<ILabelRepository, LabelRepository>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+  opt.AddServer(new Microsoft.OpenApi.Models.OpenApiServer { Url = builder.Configuration["OpenApi:ServerUrl"], Description = "Demo Server Endkunde" });
+  opt.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+  {
+    Title = "Workshop Demo",
+    Version = "v1",
+    Contact = new Microsoft.OpenApi.Models.OpenApiContact
+    {
+      Name = "Joerg Krause",
+      Email = "joerg@joergkrause.de"
+    },
+    License = new Microsoft.OpenApi.Models.OpenApiLicense
+    {
+      Name = "No License"
+    },
+    Description = "Nur zur Demo im Workshop"
+  });
+  //opt.IncludeXmlComments("");
+});
 
 builder.Services.AddAutoMapper(typeof(DomainMapping).Assembly);
 
@@ -31,7 +50,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+// app.UseDefaultFiles("/swagger/index.html");
 app.UseAuthorization();
 
 app.MapControllers();
