@@ -8,14 +8,27 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<LabelContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LabelContext")));
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+builder.Services.AddScoped<IUserContextService, UserContextService>();
 
 builder.Services.AddAuthentication("Basic").AddScheme<BasicAuthOptions, BasicAuthHandler>("Basic", null);
+builder.Services.AddAuthorization(opt =>
+{
+  opt.AddPolicy("InsertAdmin", policy =>
+  {
+    policy.RequireAuthenticatedUser();
+    policy.RequireClaim("role", "admin");
+    policy.RequireRole("Admin");
+    policy.Build();
+  });
+  opt.AddPolicy("User", policy => policy.RequireClaim("role", "user"));
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -39,6 +52,25 @@ builder.Services.AddSwaggerGen(opt =>
     Description = "Nur zur Demo im Workshop"
   });
   //opt.IncludeXmlComments("");
+  opt.AddSecurityDefinition("Basic", new OpenApiSecurityScheme
+  {
+    Name = "Basic",
+    Description = "Enter username and password",
+    Type = SecuritySchemeType.Http,
+    In = ParameterLocation.Header,
+    Scheme = "basic"
+  });
+
+  opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+  {
+    {
+        new OpenApiSecurityScheme
+        {
+            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Basic" }
+        },
+        new string[]{}
+    }
+  });
 });
 
 builder.Services.AddAutoMapper(typeof(DomainMapping).Assembly);

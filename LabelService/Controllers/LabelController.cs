@@ -3,12 +3,15 @@ using LabelService.Controllers.Dtos;
 using LabelService.Domain.Interface;
 using LabelService.Domain.Models;
 using LabelService.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace LabelService.Controllers
 {
+
+  [Authorize(AuthenticationSchemes = "Basic")]
   [Route("api/[controller]")]
   [ApiController]
   [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]
@@ -93,6 +96,7 @@ namespace LabelService.Controllers
       return Ok(dto);
     }
 
+    [Authorize(Policy = "InsertAdmin")]
     [HttpPost]
     [ProducesResponseType(typeof(void), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(void), StatusCodes.Status422UnprocessableEntity)]

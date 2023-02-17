@@ -1,8 +1,10 @@
 ﻿using LabelServiceClient;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LabelService.Controllers
 {
+
   [Route("api/[controller]")]
   [ApiController]
   [ProducesResponseType(typeof(void), StatusCodes.Status500InternalServerError)]

@@ -8,25 +8,29 @@ using System.Text.Encodings.Web;
 namespace LabelService.Security
 {
   public class BasicAuthHandler : AuthenticationHandler<BasicAuthOptions>
-  {
-
+  {    
+      
     private readonly IConfiguration _configuration;
+    private readonly IUserContextService _userContextService;
 
     public BasicAuthHandler(
       IOptionsMonitor<BasicAuthOptions> options, 
       ILoggerFactory logger, 
       UrlEncoder encoder, 
       ISystemClock clock,
-      IConfiguration configuration
+      IConfiguration configuration,
+      IUserContextService userContextService
       )
       : base(options, logger, encoder, clock)
     {
       _configuration = configuration;
+      _userContextService = userContextService;
     }
 
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
+
       if (!Request.Headers.ContainsKey("Authorization"))
         return AuthenticateResult.Fail("Missing Authorization Header");
 
@@ -56,9 +60,12 @@ namespace LabelService.Security
       var claims = new Claim[] { }; //new Claim(ClaimTypes.NameIdentifier, username)
       var identity = new ClaimsIdentity(claims, Scheme.Name);
       var principal = new ClaimsPrincipal(identity);
+
+      _userContextService.Principal = principal;
+
       var ticket = new AuthenticationTicket(principal, Scheme.Name);
 
-      return AuthenticateResult.Success(ticket);
+      return await Task.FromResult(AuthenticateResult.Success(ticket));
 
     }
   }

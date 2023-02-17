@@ -1,19 +1,22 @@
 ﻿using LabelService.Domain.Interface;
 using LabelService.Domain.Models;
 using LabelService.Infrastructure.Persistence;
+using LabelService.Security;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
 
 namespace LabelService.Infrastructure
 {
-    public class LabelRepository : ILabelRepository
+  public class LabelRepository : ILabelRepository
   {
 
     private readonly LabelContext _context;
+    private readonly IUserContextService _userContextService;
 
-    public LabelRepository(LabelContext context)
+    public LabelRepository(LabelContext context, IUserContextService userContextService)
     {
       _context = context;
+      _userContextService = userContextService;
     }
 
     public async Task<IEnumerable<Label>> GetLabels()
@@ -59,6 +62,14 @@ namespace LabelService.Infrastructure
 
     public async Task<bool> InsertOrUpdate(Label label, int deviceId = 0)
     {
+      if (!_userContextService.Principal.IsInRole("InsertAdmin"))
+      {
+        throw new NotSupportedException();
+      }
+      if (!_userContextService.Principal.Claims.Any(c => c.ValueType == "InsertAdmin"))
+      {
+        throw new NotSupportedException();
+      }
       if (deviceId > 0)
       {
         var device = await _context.Devices.FindAsync(deviceId);
@@ -68,7 +79,7 @@ namespace LabelService.Infrastructure
         }
         label.Device = device;
       }
-      
+
       _context.Entry(label).State = label.Id == 0 ? EntityState.Added : EntityState.Modified;
       var result = await _context.SaveChangesAsync();
       return result > 0;
