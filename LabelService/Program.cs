@@ -3,6 +3,8 @@ using LabelService.Domain.Interface;
 using LabelService.Domain.Models;
 using LabelService.Infrastructure;
 using LabelService.Infrastructure.Persistence;
+using LabelService.Security;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -11,8 +13,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<LabelContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("LabelContext")));
-
 builder.Services.AddScoped<ILabelRepository, LabelRepository>();
+
+builder.Services.AddAuthentication("Basic").AddScheme<BasicAuthOptions, BasicAuthHandler>("Basic", null);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -50,7 +53,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-// app.UseDefaultFiles("/swagger/index.html");
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -17,12 +17,6 @@
 
   </ItemGroup>
 
-  <ItemGroup>
-    <Protobuf Include="..\InternalGrpcService\Protos\greet.proto" GrpcServices="Client">
-      <Link>Protos\greet.proto</Link>
-    </Protobuf>
-  </ItemGroup>
-
     <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
         <Exec Command="nswag run nswag.json /variables:InputSwagger=swagger.json" />
     </Target>
