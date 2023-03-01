@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Azure;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -32,7 +33,11 @@ namespace LabelService.Security
     {
 
       if (!Request.Headers.ContainsKey("Authorization"))
+      {
+        Response.StatusCode = 401;
+        Response.Headers.Add("WWW-Authenticate", "Basic realm=\"localhost\"");
         return AuthenticateResult.Fail("Missing Authorization Header");
+      }
 
       if (!AuthenticationHeaderValue.TryParse(Request.Headers["Authorization"], out AuthenticationHeaderValue headerValue))
       {

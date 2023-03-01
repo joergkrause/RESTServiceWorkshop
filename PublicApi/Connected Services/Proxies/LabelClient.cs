@@ -86,14 +86,16 @@ namespace LabelServiceClient
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "13.15.10.0 (NJsonSchema v10.6.10.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class Client : MySwaggerClientBase, IClient
+    public partial class Client : IClient
     {
         private string _baseUrl = "";
+        private System.Net.Http.HttpClient _httpClient;
         private System.Lazy<Newtonsoft.Json.JsonSerializerSettings> _settings;
 
-        public Client(string baseUrl)
+        public Client(string baseUrl, System.Net.Http.HttpClient httpClient)
         {
             BaseUrl = baseUrl;
+            _httpClient = httpClient;
             _settings = new System.Lazy<Newtonsoft.Json.JsonSerializerSettings>(CreateSerializerSettings);
         }
 
@@ -133,11 +135,11 @@ namespace LabelServiceClient
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Label");
 
-            var client_ = new System.Net.Http.HttpClient();
+            var client_ = _httpClient;
             var disposeClient_ = false;
             try
             {
-                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -213,11 +215,11 @@ namespace LabelServiceClient
             var urlBuilder_ = new System.Text.StringBuilder();
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Label");
 
-            var client_ = new System.Net.Http.HttpClient();
+            var client_ = _httpClient;
             var disposeClient_ = false;
             try
             {
-                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     var content_ = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(body, _settings.Value));
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -306,11 +308,11 @@ namespace LabelServiceClient
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Label/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
-            var client_ = new System.Net.Http.HttpClient();
+            var client_ = _httpClient;
             var disposeClient_ = false;
             try
             {
-                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -396,11 +398,11 @@ namespace LabelServiceClient
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Label/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
-            var client_ = new System.Net.Http.HttpClient();
+            var client_ = _httpClient;
             var disposeClient_ = false;
             try
             {
-                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     var content_ = new System.Net.Http.StringContent(Newtonsoft.Json.JsonConvert.SerializeObject(body, _settings.Value));
                     content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
@@ -495,11 +497,11 @@ namespace LabelServiceClient
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Label/{id}");
             urlBuilder_.Replace("{id}", System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
-            var client_ = new System.Net.Http.HttpClient();
+            var client_ = _httpClient;
             var disposeClient_ = false;
             try
             {
-                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("DELETE");
 
@@ -573,11 +575,11 @@ namespace LabelServiceClient
             urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/Label/bytrackingid/{trackingId}");
             urlBuilder_.Replace("{trackingId}", System.Uri.EscapeDataString(ConvertToString(trackingId, System.Globalization.CultureInfo.InvariantCulture)));
 
-            var client_ = new System.Net.Http.HttpClient();
+            var client_ = _httpClient;
             var disposeClient_ = false;
             try
             {
-                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -664,11 +666,11 @@ namespace LabelServiceClient
             }
             urlBuilder_.Length--;
 
-            var client_ = new System.Net.Http.HttpClient();
+            var client_ = _httpClient;
             var disposeClient_ = false;
             try
             {
-                using (var request_ = await CreateHttpRequestMessageAsync(cancellationToken).ConfigureAwait(false))
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
                     request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
@@ -871,19 +873,6 @@ namespace LabelServiceClient
 
         [Newtonsoft.Json.JsonProperty("deviceId", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         public int DeviceId { get; set; }
-
-        public string ToJson()
-        {
-
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
-        public static LabelDto FromJson(string data)
-        {
-
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<LabelDto>(data, new Newtonsoft.Json.JsonSerializerSettings());
-
-        }
 
     }
 

@@ -1,24 +1,26 @@
-﻿using System.Text;
+﻿using System.Net.Http.Headers;
+using System.Security.Claims;
+using System.Text;
 
-namespace LabelServiceClient
+namespace LabelServiceClient;
+
+public class ApiAuthDelegatingHandler : DelegatingHandler
 {
-  public abstract class MySwaggerClientBase
+
+  private readonly IHttpContextAccessor _context;
+  private readonly string backendSecret;
+  
+  public ApiAuthDelegatingHandler(IHttpContextAccessor context, IConfiguration configuration)
   {
-    public string Auth { get; private set; }
-
-    public void SetAuth(string username, string password)
-    {
-      var encodedCred = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{username}:{password}"));
-      Auth = encodedCred;
-    }
-
-    // Called by implementing swagger client classes
-    protected Task<HttpRequestMessage> CreateHttpRequestMessageAsync(CancellationToken cancellationToken)
-    {
-      var msg = new HttpRequestMessage();
-      msg.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Auth);
-      return Task.FromResult(msg);
-    }
-
+    _context = context;
+    backendSecret = Convert.ToBase64String(Encoding.ASCII.GetBytes($"{configuration["BackendUsername"]}:{configuration["BackendPassword"]}"));    
+    InnerHandler = new HttpClientHandler();
   }
+
+  protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+  {
+    request.Headers.Authorization = new AuthenticationHeaderValue("Basic", $"{backendSecret}");
+    return base.SendAsync(request, cancellationToken);
+  }
+
 }
